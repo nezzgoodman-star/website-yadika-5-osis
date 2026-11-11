@@ -1,0 +1,824 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>SMP Yadika 5</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Plus+Jakarta+Sans:wght@400..700&display=swap">
+<style>
+/* Susunan: satu kolom berpusat (maks. 1080px). Pita latar penuh lebar hanya untuk header, forum, dan footer. */
+:root {
+  --bg: #f5eed8;
+  --surface: #fbf7e9;
+  --fg: #1d2a44;
+  --muted: #5d6779;
+  --line: #dccfae;
+  --accent: #1f4b82;
+  --on-accent: #ffffff;
+  --on-danger: #fffdf6;
+  --danger: #8c2e2a;
+  --chip: #fbf7e9;
+  --font-display: "Bricolage Grotesque", "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141c2e;
+    --surface: #1c2640;
+    --fg: #f1ead6;
+    --muted: #aab3c4;
+    --line: #2f3c5a;
+    --accent: #9fc0ea;
+    --on-accent: #101827;
+    --on-danger: #101827;
+    --danger: #e8917e;
+    --chip: #f1ead6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141c2e;
+  --surface: #1c2640;
+  --fg: #f1ead6;
+  --muted: #aab3c4;
+  --line: #2f3c5a;
+  --accent: #9fc0ea;
+  --on-accent: #101827;
+  --on-danger: #101827;
+  --danger: #e8917e;
+  --chip: #f1ead6;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 15px/1.6 var(--font-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+section[id] { scroll-margin-top: 72px; }
+input, textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); font: 400 15px/1.5 var(--font-body); }
+textarea { resize: vertical; }
+input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+input:disabled, textarea:disabled { opacity: .6; }
+
+.wrap { max-width: 1080px; margin-inline: auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Header */
+.site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; min-height: 60px; padding-block: 10px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--fg); text-decoration: none; font: 700 17px/1 var(--font-display); }
+.mark { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 8px; background: var(--accent); color: var(--on-accent); font: 800 18px/1 var(--font-display); }
+img.mark { width: 36px; height: 36px; object-fit: contain; border: 1px solid var(--line); border-radius: 8px; padding: 2px; background: var(--chip); mix-blend-mode: multiply; filter: brightness(1.9) saturate(1.3); }
+.nav { display: flex; flex-wrap: wrap; gap: 2px; }
+.nav a { padding: 8px 12px; border-radius: 999px; color: var(--muted); font-weight: 600; font-size: 14px; text-decoration: none; }
+.nav a:hover { color: var(--fg); background: var(--surface); }
+
+/* Hero */
+.hero { padding-block: clamp(40px, 8vw, 88px) clamp(32px, 5vw, 56px); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 40px; align-items: end; }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { margin-top: 14px; font-size: clamp(44px, 9vw, 96px); }
+h1 .n { color: var(--accent); padding: 0 .12em; border-radius: .14em; box-shadow: inset 0 0 0 .07em var(--accent); }
+.lead { margin-top: 18px; max-width: 36ch; font-size: 18px; color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.id-card { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 18px 22px 6px; }
+.id-card .label { margin-bottom: 4px; }
+
+/* Slideshow foto sekolah */
+.foto { margin: 0; padding-bottom: clamp(44px, 6vw, 64px); }
+.slides { position: relative; aspect-ratio: 21 / 9; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.slides-kosong { padding: 16px; color: var(--muted); font-size: 14px; text-align: center; }
+.slides-track { position: absolute; inset: 0; }
+.slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.slide-nav { position: absolute; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--fg); font: 600 22px/1 var(--font-body); cursor: pointer; }
+.slide-nav.prev { left: 12px; }
+.slide-nav.next { right: 12px; }
+.slides-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px 16px; margin-top: 12px; }
+.dots { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dot { width: 10px; height: 10px; padding: 0; border: 1px solid var(--fg); border-radius: 999px; background: transparent; cursor: pointer; }
+.dot[aria-current="true"] { background: var(--fg); }
+.foto-aksi { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 560px) {
+  .slides { aspect-ratio: 4 / 3; }
+}
+
+/* Data rows */
+.facts { margin: 0; }
+.facts > div { display: grid; grid-template-columns: minmax(96px, 0.8fr) minmax(0, 1.2fr); gap: 14px; padding-block: 14px; border-bottom: 1px solid var(--line); }
+.facts > div:last-child { border-bottom: 0; }
+.facts dt { color: var(--muted); font-size: 14px; }
+.facts dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.about .facts { border-top: 1px solid var(--line); margin-top: 24px; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--fg); font: 600 14px/1 var(--font-body); text-decoration: none; cursor: pointer; }
+.btn:hover { border-color: var(--fg); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; }
+.btn.small { min-height: 34px; padding: 0 12px; font-size: 13px; }
+.btn.danger { color: var(--danger); }
+.btn.danger.solid { background: var(--danger); border-color: var(--danger); color: var(--on-danger); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Sections */
+.section { padding-block: clamp(44px, 7vw, 80px); }
+.band { background: var(--surface); border-block: 1px solid var(--line); }
+.band .wrap { padding-block: clamp(44px, 7vw, 80px); }
+.head { display: grid; gap: 10px; margin-bottom: 28px; }
+h2 { font-size: clamp(30px, 4.4vw, 44px); }
+.head p { max-width: 60ch; color: var(--muted); }
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 40px; align-items: start; }
+.about p { font-size: 17px; }
+.label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.kontak { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 40px; }
+.kv + .kv { margin-top: 18px; }
+.tautan { display: inline-block; margin-top: 12px; font-weight: 700; }
+
+/* Forum */
+.status { margin-top: 0; margin-bottom: 18px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); font-size: 14px; }
+.composer { display: grid; gap: 14px; padding: 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.composer h3 { font-size: 22px; }
+.campo { display: grid; gap: 6px; }
+.campo > span { font-size: 13px; font-weight: 700; color: var(--muted); }
+.baris { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hint { font-size: 13px; color: var(--muted); }
+.daftar { margin-top: 8px; }
+.kosong { display: grid; gap: 4px; padding: 28px 0; border-top: 1px solid var(--line); color: var(--muted); }
+.judul-kosong { color: var(--fg); font-weight: 700; }
+.topik { display: grid; gap: 10px; padding-block: 22px; border-top: 1px solid var(--line); }
+.topik-kepala { display: grid; gap: 4px; }
+.judul-topik { font-size: 20px; overflow-wrap: anywhere; }
+.meta { font-size: 13px; color: var(--muted); }
+.isi-topik { white-space: pre-wrap; overflow-wrap: anywhere; }
+.aksi { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.komentar-wrap { display: grid; gap: 14px; margin-top: 6px; padding-left: 14px; border-left: 1px solid var(--line); }
+.komentar { display: grid; gap: 4px; }
+.komentar-isi { white-space: pre-wrap; overflow-wrap: anywhere; }
+.form-komentar { display: grid; gap: 8px; }
+.kendali-hapus { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tanya { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+
+/* Footer */
+.site-footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: 13px; }
+.site-footer .wrap { display: grid; gap: 6px; }
+.watermark { font-size: 11px; letter-spacing: .08em; opacity: .7; }
+
+@media (max-width: 760px) {
+  .hero-grid, .about { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+}
+@media (max-width: 560px) {
+  .facts > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+</style>
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href="#beranda"><img class="mark" src="logo.jpg" alt="Logo Yayasan Abdi Karya (Yadika)" width="36" height="36"><span>SMP Yadika 5</span></a>
+    <nav class="nav" aria-label="Menu utama">
+      <a href="#tentang">Tentang</a>
+      <a href="#forum">Forum</a>
+      <a href="#kontak">Kontak</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="beranda" class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Sekolah menengah pertama swasta · Jakarta Barat</p>
+        <h1>SMP Yadika <span class="n">5</span></h1>
+        <p class="lead">Informasi sekolah, identitas resmi, dan forum diskusi untuk siswa dalam satu halaman.</p>
+        <div class="actions">
+          <a class="btn primary" href="#forum">Buka forum siswa</a>
+          <a class="btn" href="#tentang">Tentang sekolah</a>
+        </div>
+      </div>
+      <aside class="id-card" aria-labelledby="id-judul">
+        <p class="label" id="id-judul">Identitas satuan pendidikan</p>
+        <dl class="facts">
+          <div><dt>Status</dt><dd>Swasta</dd></div>
+          <div><dt>Bentuk</dt><dd>SMP</dd></div>
+          <div><dt>Wilayah</dt><dd>Kembangan, Jakarta Barat</dd></div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="foto" aria-label="Foto sekolah">
+      <div class="slides" id="slides">
+        <p class="slides-kosong" id="slides-kosong">Foto sekolah belum ditambahkan.</p>
+        <div class="slides-track" id="slides-track"></div>
+        <button class="slide-nav prev" id="slide-prev" type="button" aria-label="Foto sebelumnya" hidden>‹</button>
+        <button class="slide-nav next" id="slide-next" type="button" aria-label="Foto berikutnya" hidden>›</button>
+      </div>
+      <div class="slides-bar">
+        <div class="dots" id="slides-dots"></div>
+        <div class="foto-aksi">
+          <span class="hint" id="foto-hint"></span>
+          <label class="btn small" id="foto-tambah" hidden>Tambah foto<input id="foto-input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
+          <span id="foto-hapus"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="tentang" class="section">
+    <div class="wrap about">
+      <h2>Tentang sekolah</h2>
+      <div>
+        <p>SMP Yadika 5 adalah satuan pendidikan menengah pertama swasta. Sekolah ini berada di Kelurahan Joglo, Kecamatan Kembangan, Jakarta Barat.</p>
+        <dl class="facts">
+          <div><dt>Alamat</dt><dd>Jl. Joglo Raya No. 190, Kelurahan Joglo, Kecamatan Kembangan, Jakarta Barat, DKI Jakarta</dd></div>
+          <div><dt>Jenjang</dt><dd>Pendidikan menengah pertama (SMP)</dd></div>
+          <div><dt>Kementerian pembina</dt><dd>Kementerian Pendidikan Dasar dan Menengah</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="forum" class="band">
+    <div class="wrap">
+      <div class="head">
+        <h2>Forum siswa</h2>
+        <p>Tempat siswa bertanya, berbagi informasi, dan saling membalas. Topik dan komentar hanya bisa dilihat oleh akun yang punya akses ke halaman ini.</p>
+      </div>
+
+      <div id="forum-status" class="status" role="status" hidden></div>
+
+      <form id="composer" class="composer" novalidate>
+        <h3>Mulai topik baru</h3>
+        <label class="campo">
+          <span>Judul topik</span>
+          <input id="judul" type="text" maxlength="120" autocomplete="off" placeholder="Misal: Jadwal ujian tengah semester" disabled>
+        </label>
+        <label class="campo">
+          <span>Isi</span>
+          <textarea id="isi" rows="4" maxlength="2000" placeholder="Tulis pertanyaan atau informasi yang ingin dibagikan" disabled></textarea>
+        </label>
+        <div class="baris">
+          <p class="hint" id="composer-hint">Memuat forum…</p>
+          <button id="kirim-topik" class="btn primary" type="submit" disabled>Kirim topik</button>
+        </div>
+      </form>
+
+      <div id="daftar" class="daftar">
+        <div class="kosong">
+          <p class="judul-kosong">Belum ada topik.</p>
+          <p>Tulis topik pertama di atas. Siswa lain bisa membalas dengan komentar di bawahnya.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="kontak" class="section">
+    <div class="wrap">
+      <div class="head"><h2>Kontak dan lokasi</h2></div>
+      <div class="kontak">
+        <div>
+          <p class="label">Alamat</p>
+          <p>Jl. Joglo Raya No. 190, Kelurahan Joglo, Kecamatan Kembangan, Jakarta Barat, DKI Jakarta</p>
+          <a class="tautan" href="https://www.google.com/maps/search/?api=1&amp;query=Jl.+Joglo+Raya+No.+190+Joglo+Kembangan+Jakarta+Barat" target="_blank" rel="noopener">Buka di Google Maps</a>
+        </div>
+        <div id="kontak-tambahan"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© 2026 SMP Yadika 5. All rights reserved.</p>
+    <p class="watermark">nez production</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // Kontak tambahan. Isi jika ingin ditampilkan; biarkan kosong jika belum ada.
+  const SEKOLAH = { telepon: "", email: "" };
+
+  const MAX_JUDUL = 120, MAX_ISI = 2000, MAX_KOMENTAR = 500, MAX_TOPIK = 200;
+  const MAX_FOTO = 5 * 1024 * 1024;
+  const FOTO_BAWAAN = ["foto/1-foto-bersama.jpg", "foto/2-papan-nama.jpg", "foto/3-gedung.jpg"];
+  const JENIS_FOTO = ["image/jpeg", "image/png", "image/webp"];
+  const JEDA_SLIDE_MS = 5000;
+
+  const st = {
+    db: null, user: null, assets: null, idSaya: null, pemilik: false, bisaTulis: null,
+    topik: [], komentar: new Map(), buka: new Set(), langganan: new Map(),
+    draf: new Map(), profil: {}, sibuk: new Set(), timer: null,
+    foto: [...FOTO_BAWAAN], slide: 0, fotoJeda: false, timerFoto: null,
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, teks) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (teks != null) n.textContent = teks;
+    return n;
+  };
+  const idBaru = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  const tanggal = (ms) => typeof ms === "number"
+    ? new Date(ms).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : "";
+  const ambil = (nama) => (window.claude && window.claude.use ? window.claude.use(nama) : Promise.resolve(null));
+  const terkunci = () => !st.db || st.bisaTulis === false;
+  const bolehHapus = (penulis) => st.pemilik || (!!st.idSaya && penulis === st.idSaya);
+
+  function setStatus(pesan, sementara) {
+    const kotak = $("forum-status");
+    clearTimeout(st.timer);
+    kotak.textContent = pesan || "";
+    kotak.hidden = !pesan;
+    if (pesan && sementara) {
+      st.timer = setTimeout(() => { kotak.hidden = true; kotak.textContent = ""; }, 3500);
+    }
+  }
+
+  function pesanError(e) {
+    switch (e && e.code) {
+      case "invalid_argument": return "Data belum sesuai, atau akunmu belum punya izin menulis.";
+      case "quota_exceeded": return "Ruang penyimpanan sudah penuh. Hubungi pengelola sekolah.";
+      case "resource_exhausted": return "Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.";
+      case "not_granted":
+      case "capability_disabled":
+      case "capability_removed": return "Fitur ini tidak tersedia di tampilan ini.";
+      case "revoked": return "Fitur ini tidak bisa dipakai lagi di tampilan ini.";
+      default: return "Terjadi kendala. Coba lagi sebentar.";
+    }
+  }
+
+  function applyComposer() {
+    const kunci = terkunci();
+    for (const n of $("composer").querySelectorAll("input, textarea, button")) n.disabled = kunci;
+    $("composer-hint").textContent = !st.db
+      ? "Forum belum bisa dimuat di tampilan ini."
+      : st.bisaTulis === false
+        ? "Akunmu hanya bisa membaca. Minta pengelola memberi akses kontributor."
+        : "Topik dan komentar terlihat oleh semua akun yang punya akses ke halaman ini. Pengelola dapat menghapus konten yang tidak pantas.";
+  }
+
+  // ---------- Slideshow foto sekolah ----------
+
+  function setFotoHint(pesan) {
+    $("foto-hint").textContent = pesan || "";
+  }
+
+  function geserFoto(langkah) {
+    const total = st.foto.length;
+    if (!total) return;
+    st.slide = (st.slide + langkah + total) % total;
+    renderFoto();
+  }
+
+  function mulaiOtomatis() {
+    clearInterval(st.timerFoto);
+    st.timerFoto = null;
+    if (st.foto.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    st.timerFoto = setInterval(() => {
+      if (!st.fotoJeda) geserFoto(1);
+    }, JEDA_SLIDE_MS);
+  }
+
+  function renderFoto() {
+    const total = st.foto.length;
+    const track = $("slides-track");
+    const kunci = st.foto.join(",");
+    if (track.dataset.kunci !== kunci) {
+      track.replaceChildren();
+      st.foto.forEach((id, i) => {
+        const img = el("img", "slide");
+        img.src = id.includes("/") ? id : "/_blob/" + id;
+        img.alt = `Foto SMP Yadika 5, ${i + 1} dari ${total}`;
+        img.decoding = "async";
+        track.append(img);
+      });
+      track.dataset.kunci = kunci;
+    }
+    if (st.slide >= total) st.slide = Math.max(0, total - 1);
+    [...track.children].forEach((img, i) => { img.hidden = i !== st.slide; });
+
+    const dots = $("slides-dots");
+    dots.replaceChildren();
+    if (total > 1) {
+      st.foto.forEach((_, i) => {
+        const titik = el("button", "dot");
+        titik.type = "button";
+        titik.setAttribute("aria-label", `Foto ${i + 1}`);
+        if (i === st.slide) titik.setAttribute("aria-current", "true");
+        titik.addEventListener("click", () => {
+          st.slide = i;
+          renderFoto();
+          mulaiOtomatis();
+        });
+        dots.append(titik);
+      });
+    }
+
+    $("slide-prev").hidden = total < 2;
+    $("slide-next").hidden = total < 2;
+    $("slides-kosong").hidden = total > 0;
+    $("foto-tambah").hidden = !(st.pemilik && st.assets && st.db);
+
+    const wadahHapus = $("foto-hapus");
+    wadahHapus.replaceChildren();
+    if (st.pemilik && st.db && total > 0) wadahHapus.append(kendaliHapus(() => hapusFoto()));
+  }
+
+  function langgananFoto() {
+    if (!st.db) return;
+    st.db.doc("pengaturan/foto").onSnapshot(
+      (snap) => {
+        if (!snap.exists) {
+          st.foto = [...FOTO_BAWAAN];
+          renderFoto();
+          mulaiOtomatis();
+          return;
+        }
+        const data = snap.data() || {};
+        let ids = Array.isArray(data.daftar) ? data.daftar : [];
+        if (!ids.length && typeof data.assetId === "string") ids = [data.assetId];
+        st.foto = ids.filter((x) => typeof x === "string" && x.length > 0);
+        renderFoto();
+        mulaiOtomatis();
+      },
+      () => {}
+    );
+  }
+
+  async function simpanDaftarFoto(daftar) {
+    await st.db.doc("pengaturan/foto").set({ daftar });
+  }
+
+  async function tambahFoto(berkas) {
+    if (!st.assets || !st.db || !st.pemilik || !berkas.length) return;
+    const awal = [...st.foto];
+    let daftar = [...awal];
+    for (const f of berkas) {
+      if (!JENIS_FOTO.includes(f.type)) {
+        setFotoHint("Format foto harus JPG, PNG, atau WEBP.");
+        continue;
+      }
+      if (f.size > MAX_FOTO) {
+        setFotoHint("Ukuran tiap foto maksimal 5 MB.");
+        continue;
+      }
+      setFotoHint(`Mengunggah ${f.name}…`);
+      try {
+        const hasil = await st.assets.upload(f);
+        daftar = [...daftar, hasil.id];
+        await simpanDaftarFoto(daftar);
+        st.foto = daftar;
+        st.slide = daftar.length - 1;
+        renderFoto();
+        mulaiOtomatis();
+      } catch (e) {
+        setFotoHint(pesanError(e));
+      }
+    }
+    if (daftar.length > awal.length) setFotoHint("Foto ditambahkan.");
+  }
+
+  async function hapusFoto() {
+    if (!st.db || !st.pemilik || !st.foto.length) return;
+    const id = st.foto[st.slide];
+    const daftar = st.foto.filter((_, i) => i !== st.slide);
+    try {
+      await simpanDaftarFoto(daftar);
+      if (st.assets && !id.includes("/")) {
+        try { await st.assets.delete(id); } catch (_) { /* file lama boleh tetap tersimpan */ }
+      }
+      setFotoHint("Foto dihapus.");
+    } catch (e) {
+      setFotoHint(pesanError(e));
+    }
+  }
+
+  // ---------- Forum ----------
+
+  function namaOf(id) {
+    if (!id) return "Anonim";
+    if (id === st.idSaya) return "Kamu";
+    const p = st.profil[id];
+    return (p && p.name) || "Pengguna";
+  }
+
+  async function paint() {
+    if (st.user) {
+      const ids = new Set();
+      for (const t of st.topik) if (t.authorId) ids.add(t.authorId);
+      for (const daftar of st.komentar.values()) for (const k of daftar) if (k.authorId) ids.add(k.authorId);
+      if (ids.size) st.profil = await st.user.profiles([...ids]);
+    }
+    renderTopik();
+  }
+
+  function renderTopik() {
+    const daftar = $("daftar");
+    const aktif = document.activeElement;
+    const fokus = aktif && aktif.id && daftar.contains(aktif)
+      ? { id: aktif.id, a: aktif.selectionStart, b: aktif.selectionEnd }
+      : null;
+
+    daftar.replaceChildren();
+    if (!st.topik.length) {
+      const kosong = el("div", "kosong");
+      kosong.append(
+        el("p", "judul-kosong", "Belum ada topik."),
+        el("p", "", "Tulis topik pertama di atas. Siswa lain bisa membalas dengan komentar di bawahnya.")
+      );
+      daftar.append(kosong);
+    } else {
+      for (const t of st.topik) daftar.append(kartuTopik(t));
+    }
+
+    if (fokus) {
+      const n = document.getElementById(fokus.id);
+      if (n) {
+        n.focus({ preventScroll: true });
+        if (typeof fokus.a === "number") n.setSelectionRange(fokus.a, fokus.b);
+      }
+    }
+  }
+
+  function kendaliHapus(jalankan) {
+    const wadah = el("span", "kendali-hapus");
+    const mulai = el("button", "btn ghost danger small", "Hapus");
+    mulai.type = "button";
+    const tanya = el("span", "tanya");
+    tanya.hidden = true;
+    const ya = el("button", "btn danger solid small", "Ya, hapus");
+    ya.type = "button";
+    const batal = el("button", "btn ghost small", "Batal");
+    batal.type = "button";
+    mulai.addEventListener("click", () => { mulai.hidden = true; tanya.hidden = false; });
+    batal.addEventListener("click", () => { tanya.hidden = true; mulai.hidden = false; });
+    ya.addEventListener("click", async () => {
+      ya.disabled = true;
+      await jalankan();
+      ya.disabled = false;
+    });
+    tanya.append(el("span", "", "Hapus permanen?"), ya, batal);
+    wadah.append(mulai, tanya);
+    return wadah;
+  }
+
+  function kartuTopik(t) {
+    const kartu = el("article", "topik");
+    const kepala = el("div", "topik-kepala");
+    kepala.append(
+      el("h3", "judul-topik", t.judul || "(tanpa judul)"),
+      el("p", "meta", `${namaOf(t.authorId)} · ${tanggal(t.createdAt)}`)
+    );
+    const aksi = el("div", "aksi");
+    const terbuka = st.buka.has(t.id);
+    const tombol = el("button", "btn ghost small", terbuka ? "Tutup komentar" : "Lihat komentar");
+    tombol.type = "button";
+    tombol.addEventListener("click", () => bukaTutup(t.id));
+    aksi.append(tombol);
+    if (bolehHapus(t.authorId)) aksi.append(kendaliHapus(() => hapusTopik(t.id)));
+    kartu.append(kepala, el("p", "isi-topik", t.isi || ""), aksi);
+    if (terbuka) kartu.append(blokKomentar(t.id));
+    return kartu;
+  }
+
+  function blokKomentar(tid) {
+    const blok = el("div", "komentar-wrap");
+    const daftar = st.komentar.get(tid);
+    if (!daftar) {
+      blok.append(el("p", "meta", "Memuat komentar…"));
+    } else if (!daftar.length) {
+      blok.append(el("p", "meta", "Belum ada komentar. Jadilah yang pertama membalas."));
+    } else {
+      for (const c of daftar) blok.append(itemKomentar(tid, c));
+    }
+    blok.append(formKomentar(tid));
+    return blok;
+  }
+
+  function itemKomentar(tid, c) {
+    const item = el("div", "komentar");
+    item.append(
+      el("p", "meta", `${namaOf(c.authorId)} · ${tanggal(c.createdAt)}`),
+      el("p", "komentar-isi", c.isi || "")
+    );
+    if (bolehHapus(c.authorId)) item.append(kendaliHapus(() => hapusKomentar(tid, c.id)));
+    return item;
+  }
+
+  function formKomentar(tid) {
+    const form = el("form", "form-komentar");
+    const area = el("textarea");
+    area.id = "k-" + tid;
+    area.rows = 2;
+    area.maxLength = MAX_KOMENTAR;
+    area.placeholder = "Tulis komentar…";
+    area.setAttribute("aria-label", "Tulis komentar");
+    area.value = st.draf.get(tid) || "";
+    area.disabled = terkunci();
+
+    const hitung = el("span", "hint", terkunci() ? "Akunmu hanya bisa membaca." : `${area.value.length}/${MAX_KOMENTAR}`);
+    area.addEventListener("input", () => {
+      st.draf.set(tid, area.value);
+      hitung.textContent = `${area.value.length}/${MAX_KOMENTAR}`;
+    });
+
+    const kirim = el("button", "btn primary small", "Kirim");
+    kirim.type = "submit";
+    kirim.disabled = terkunci();
+
+    const baris = el("div", "baris");
+    baris.append(hitung, kirim);
+    form.append(area, baris);
+    form.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      kirimKomentar(tid, area.value);
+    });
+    return form;
+  }
+
+  async function kirimTopik() {
+    if (!st.db) return;
+    const judul = $("judul").value.trim();
+    const isi = $("isi").value.trim();
+    if (!judul) return setStatus("Judul topik belum diisi.");
+    if (judul.length > MAX_JUDUL) return setStatus(`Judul maksimal ${MAX_JUDUL} karakter.`);
+    if (!isi) return setStatus("Isi topik belum diisi.");
+    if (isi.length > MAX_ISI) return setStatus(`Isi topik maksimal ${MAX_ISI} karakter.`);
+    if (st.sibuk.has("topik")) return;
+    st.sibuk.add("topik");
+    try {
+      await st.db.doc(`forum/${idBaru()}`).set({ judul, isi, authorId: st.idSaya, createdAt: Date.now() });
+      $("judul").value = "";
+      $("isi").value = "";
+      setStatus("Topik terkirim.", true);
+    } catch (e) {
+      setStatus(pesanError(e));
+    } finally {
+      st.sibuk.delete("topik");
+    }
+  }
+
+  async function kirimKomentar(tid, mentah) {
+    if (!st.db) return;
+    const teks = (mentah || "").trim();
+    if (!teks) return setStatus("Komentar belum diisi.", true);
+    if (teks.length > MAX_KOMENTAR) return setStatus(`Komentar maksimal ${MAX_KOMENTAR} karakter.`);
+    const kunci = "komentar:" + tid;
+    if (st.sibuk.has(kunci)) return;
+    st.sibuk.add(kunci);
+    try {
+      await st.db.doc(`forum/${tid}/komentar/${idBaru()}`).set({ isi: teks, authorId: st.idSaya, createdAt: Date.now() });
+      st.draf.delete(tid);
+      setStatus("");
+    } catch (e) {
+      setStatus(pesanError(e));
+    } finally {
+      st.sibuk.delete(kunci);
+      renderTopik();
+    }
+  }
+
+  async function hapusTopik(tid) {
+    const kunci = "hapus:" + tid;
+    if (!st.db || st.sibuk.has(kunci)) return;
+    st.sibuk.add(kunci);
+    try {
+      const isiKomentar = await st.db.collection(`forum/${tid}/komentar`).get();
+      for (const d of isiKomentar.docs) await st.db.doc(`forum/${tid}/komentar/${d.id}`).delete();
+      await st.db.doc(`forum/${tid}`).delete();
+      const berhenti = st.langganan.get(tid);
+      if (berhenti) berhenti();
+      st.langganan.delete(tid);
+      st.buka.delete(tid);
+      st.komentar.delete(tid);
+      setStatus("Topik dihapus.", true);
+    } catch (e) {
+      setStatus(pesanError(e));
+    } finally {
+      st.sibuk.delete(kunci);
+      renderTopik();
+    }
+  }
+
+  async function hapusKomentar(tid, cid) {
+    if (!st.db) return;
+    try {
+      await st.db.doc(`forum/${tid}/komentar/${cid}`).delete();
+    } catch (e) {
+      setStatus(pesanError(e));
+    }
+  }
+
+  function langgananKomentar(tid) {
+    if (!st.db || st.langganan.has(tid)) return;
+    const q = st.db.collection(`forum/${tid}/komentar`).orderBy("createdAt", "asc").limit(500);
+    const berhenti = q.onSnapshot(
+      (snap) => {
+        st.komentar.set(tid, snap.docs.map((d) => ({ id: d.id, ...(d.data() || {}) })));
+        paint();
+      },
+      (e) => setStatus(pesanError(e))
+    );
+    st.langganan.set(tid, berhenti);
+  }
+
+  function bukaTutup(tid) {
+    if (st.buka.has(tid)) {
+      st.buka.delete(tid);
+      const berhenti = st.langganan.get(tid);
+      if (berhenti) {
+        berhenti();
+        st.langganan.delete(tid);
+      }
+      st.komentar.delete(tid);
+    } else {
+      st.buka.add(tid);
+      langgananKomentar(tid);
+    }
+    renderTopik();
+  }
+
+  function langgananTopik() {
+    let adaData = false;
+    const batas = setTimeout(() => {
+      setStatus(adaData ? "Data mungkin belum terbaru." : "Forum belum bisa dimuat. Coba lagi beberapa saat.");
+    }, 10000);
+    st.db.collection("forum").orderBy("createdAt", "desc").limit(MAX_TOPIK).onSnapshot(
+      (snap) => {
+        adaData = true;
+        if (!snap.metadata.fromCache) {
+          clearTimeout(batas);
+          setStatus("");
+        }
+        st.topik = snap.docs.map((d) => ({ id: d.id, ...(d.data() || {}) }));
+        paint();
+      },
+      (e) => {
+        clearTimeout(batas);
+        setStatus(pesanError(e));
+      }
+    );
+  }
+
+  // ---------- Awal ----------
+
+  function renderKontakTambahan() {
+    const wadah = $("kontak-tambahan");
+    const baris = [["Telepon", SEKOLAH.telepon], ["Email", SEKOLAH.email]].filter(([, v]) => v);
+    for (const [label, nilai] of baris) {
+      const blok = el("div", "kv");
+      blok.append(el("p", "label", label), el("p", "", nilai));
+      wadah.append(blok);
+    }
+  }
+
+  async function mulai() {
+    renderKontakTambahan();
+    st.db = await ambil("db");
+    st.user = await ambil("user");
+    st.assets = await ambil("assets");
+    if (st.user) {
+      const saya = await st.user.me();
+      st.idSaya = saya.id || null;
+      st.pemilik = await st.user.isOwner();
+      st.bisaTulis = await st.user.can("data.write");
+    }
+    applyComposer();
+    renderFoto();
+    if (st.db) {
+      langgananFoto();
+      langgananTopik();
+    }
+    renderTopik();
+  }
+
+  $("composer").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    kirimTopik();
+  });
+
+  $("slide-prev").addEventListener("click", () => { geserFoto(-1); mulaiOtomatis(); });
+  $("slide-next").addEventListener("click", () => { geserFoto(1); mulaiOtomatis(); });
+  $("slides").addEventListener("mouseenter", () => { st.fotoJeda = true; });
+  $("slides").addEventListener("mouseleave", () => { st.fotoJeda = false; });
+  $("slides").addEventListener("focusin", () => { st.fotoJeda = true; });
+  $("slides").addEventListener("focusout", () => { st.fotoJeda = false; });
+
+  $("foto-input").addEventListener("change", (ev) => {
+    const berkas = Array.from(ev.target.files || []);
+    ev.target.value = "";
+    tambahFoto(berkas);
+  });
+
+  mulai().catch(() => setStatus("Forum tidak bisa dimuat sekarang."));
+})();
+</script>
+
+</body></html>
